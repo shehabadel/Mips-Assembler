@@ -2,7 +2,7 @@ import java.util.HashMap;
 
 class InstructionSet{
    
-    private static HashMap<String, InstructionStruct> instructionMap;
+    private HashMap<String, InstructionStruct> instructionMap;
 
     public void init(){
         //add, sub, addi, lw, sw, slt, slti, beq, bne, j, jal, jr    
@@ -26,16 +26,16 @@ class InstructionSet{
     }
 
     //Returns blank string if the instruction was not found.
-    public static String getType(String instruction){
-        if(instructionMap.containsKey(instruction)){
-            return instructionMap.get(instruction).type; 
+    public String getType(String instruction){
+        if(instructionMap.containsKey("add")){
+            return instructionMap.get("add").type; 
         }else{
             return "";
         }
     }
 
     //Returns -1 if instruction not found
-    public static int getOpCode(String instruction){
+    public int getOpCode(String instruction){
          if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).opCode; 
         }else{
@@ -46,7 +46,7 @@ class InstructionSet{
     
     //returns -2 if non r-type
     //returns -1 if instruction was not found
-    public static int getFunct(String instruction){
+    public int getFunct(String instruction){
         if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).function; 
         }else{
