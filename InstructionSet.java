@@ -36,7 +36,7 @@ class InstructionSet{
 
     //Returns -1 if instruction not found
     public static int getOpCode(String instruction){
-         if(instructionMap.containsKey(instruction)){
+        if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).opCode; 
         }else{
             return -1;
