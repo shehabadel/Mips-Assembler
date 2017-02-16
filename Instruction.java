@@ -46,7 +46,7 @@ class Instruction{
             temp = (temp << 10) + InstructionSet.getFunct(instruction);
         }else if(type == "I"){
             temp = (temp << 5) +  Registers.get(source);
-            temp = (temp << 5) + Registers.get(target) * pow(2, 16);
+            temp = (temp << 5) + Registers.get(target);
             temp = (temp << 16) + immediate;
         }       
         return Long.toHexString(temp);

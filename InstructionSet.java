@@ -4,7 +4,7 @@ class InstructionSet{
    
     private static HashMap<String, InstructionStruct> instructionMap;
 
-    public static void init(){
+    public void init(){
         //add, sub, addi, lw, sw, slt, slti, beq, bne, j, jal, jr    
         if(instructionMap != null){
             instructionMap = new HashMap<>();
@@ -26,8 +26,8 @@ class InstructionSet{
     }
 
     //Returns blank string if the instruction was not found.
-    public String getType(String instruction){
-        if(instructionMap.contains(instruction)){
+    public static String getType(String instruction){
+        if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).type; 
         }else{
             return "";
@@ -35,8 +35,8 @@ class InstructionSet{
     }
 
     //Returns -1 if instruction not found
-    public int getOpCode(String instruction){
-         if(instructionMap.contains(instruction)){
+    public static int getOpCode(String instruction){
+         if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).opCode; 
         }else{
             return -1;
@@ -46,8 +46,8 @@ class InstructionSet{
     
     //returns -2 if non r-type
     //returns -1 if instruction was not found
-    public int getFunct(String instruction){
-          if(instructionMap.contains(instruction)){
+    public static int getFunct(String instruction){
+        if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).function; 
         }else{
             return -1;
