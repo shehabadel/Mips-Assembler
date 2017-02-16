@@ -92,12 +92,17 @@ public class Driver {
               break;
             }//case
             case "J": {
-              //mipsInstruction.setJType(instructionArray[1], symbolTable.get(instructionArray[2]));
+              mipsInstruction.setJType(instructionArray[1], symbolTable.get(instructionArray[2]));
 
               break;
             }//case
             case "R": {
-              mipsInstruction.setRType(instructionArray[1], instructionArray[3], instructionArray[4], instructionArray[2]);
+              if (instructionArray[1] == "jr") {
+                mipsInstruction.setRType(instructionArray[1], instructionArray[2], "", "");
+              }
+              else {
+                mipsInstruction.setRType(instructionArray[1], instructionArray[3], instructionArray[4], instructionArray[2]);
+              }
 
               break;
             }//case
@@ -106,7 +111,7 @@ public class Driver {
             }//default
           }//switch
 
-          //nonLabeledInstruction = nonLabeledInstruction + mipsInstruction.toString();
+          nonLabeledInstruction = nonLabeledInstruction + mipsInstruction.toString();
 
           instructionsList.add(nonLabeledInstruction);
 

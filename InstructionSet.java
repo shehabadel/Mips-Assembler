@@ -2,12 +2,13 @@ import java.util.HashMap;
 
 class InstructionSet{
    
-    private HashMap<String, InstructionStruct> instructionMap;
+    private static HashMap<String, InstructionStruct> instructionMap;
 
     public void init(){
+   
         //add, sub, addi, lw, sw, slt, slti, beq, bne, j, jal, jr    
-        if(instructionMap != null){
-            instructionMap = new HashMap<>();
+        if(instructionMap == null){
+            instructionMap = new HashMap<String, InstructionStruct>();
             //Set up all instructions into HashMap for lookup. Numeric values are decimal.
             instructionMap.put("add", new InstructionStruct("add", "R", 0, 32));
             instructionMap.put("sub", new InstructionStruct("sub", "R", 0, 34));
@@ -26,16 +27,16 @@ class InstructionSet{
     }
 
     //Returns blank string if the instruction was not found.
-    public String getType(String instruction){
-        if(instructionMap.containsKey("add")){
-            return instructionMap.get("add").type; 
+    public static String getType(String instruction){
+        if(instructionMap.containsKey(instruction)){
+            return instructionMap.get(instruction).type; 
         }else{
             return "";
         }
     }
 
     //Returns -1 if instruction not found
-    public int getOpCode(String instruction){
+    public static int getOpCode(String instruction){
          if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).opCode; 
         }else{
@@ -46,7 +47,7 @@ class InstructionSet{
     
     //returns -2 if non r-type
     //returns -1 if instruction was not found
-    public int getFunct(String instruction){
+    public static int getFunct(String instruction){
         if(instructionMap.containsKey(instruction)){
             return instructionMap.get(instruction).function; 
         }else{
