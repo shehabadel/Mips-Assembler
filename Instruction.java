@@ -18,7 +18,7 @@ class Instruction{
         this.jumpAddress = jump - address - 4;
         type = "J";   
     }
-    public void setRType(int address, String instruction, String source, String target, String destination){
+    public void setRType(String instruction, String source, String target, String destination){
      
         this.instruction = instruction;
         this.destination = destination;
