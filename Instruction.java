@@ -13,8 +13,9 @@ class Instruction{
         label = newLabel;
     }
   
-    public void setJType(String instruction, String jump){
+    public void setJType(String instruction, int jump){
         this.instruction = instruction;     
+        this.jumpAddress = jump - address - 4;
         type = "J";   
     }
     public void setRType(int address, String instruction, String source, String target, String destination){
@@ -31,7 +32,7 @@ class Instruction{
         this.instruction = instruction;
         this.source = source;
         this.target = target;
-        this.immediate = Integer.parseInt(immediate, 16);
+        this.immediate = Integer.parseInt(immediate);
         type = "I";   
     }
 
@@ -53,26 +54,7 @@ class Instruction{
     }
 
     public String toString(){ // Formats for output
-        StringBuilder sb = new StringBuilder();
-        if(!label.equals(null) && !label.equals("")){
-            sb.append(label + ":\t");
-        }else{
-            sb.append("\t\t");
-        }
-        
-        sb.append(instruction + "\t");
-
-        if(type.equals("J")){
-            sb.append(jumpAddress + "\t");
-        }else if(type.equals("R")){
-            sb.append(destination + "," + source + "," + target);
-        }else if(type.equals("I")){
-            sb.append(source + "," + target + "," + immediate);
-        }else{
-            return "";
-        }
-        sb.append("\t\t" + address + "\t" + toHex());
-        return sb.toString();
+       return ("\t\t" + address + "\t" + toHex());
     }
 
 }
