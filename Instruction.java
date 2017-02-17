@@ -13,7 +13,7 @@ class Instruction{
   
     public void setJType(String instruction, int jump){
         this.instruction = instruction;     
-        this.jumpAddress = jump - address - 4;
+        this.jumpAddress = jump; 
         type = "J";   
     }
     public void setRType(String instruction, String source, String target, String destination){
@@ -31,6 +31,14 @@ class Instruction{
         this.source = source;
         this.target = target;
         this.immediate = Integer.parseInt(immediate);
+    
+        if(instruction.equals("bne") || instruction.equals("beq")){
+            this.immediate = (this.immediate - address - 4) / 4;
+            this.source = target;
+            this.target = source;
+          
+        }
+
         type = "I";   
     }
 

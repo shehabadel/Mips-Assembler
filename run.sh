@@ -1,3 +1,3 @@
-javac *
-java Driver.class
+javac *.java
+java Driver << test.text
 
