@@ -5,9 +5,10 @@ class InstructionSet{
     private static HashMap<String, InstructionStruct> instructionMap;
 
     public void init(){
+   
         //add, sub, addi, lw, sw, slt, slti, beq, bne, j, jal, jr    
-        if(instructionMap != null){
-            instructionMap = new HashMap<>();
+        if(instructionMap == null){
+            instructionMap = new HashMap<String, InstructionStruct>();
             //Set up all instructions into HashMap for lookup. Numeric values are decimal.
             instructionMap.put("add", new InstructionStruct("add", "R", 0, 32));
             instructionMap.put("sub", new InstructionStruct("sub", "R", 0, 34));

@@ -1,16 +1,14 @@
 class Instruction{  
     private int address, jumpAddress, immediate;
-    private String instruction, source, target, destination, label;
-    private String type;
+    private String instruction, source, target, destination, type;
+
+    
     //Destination will hold immediates and jump addresses
     // Enum type; R, I, J (Later could add FR, FJ if later assignment uses it)
     
     Instruction(int address){
         this.address = address;
-    }
-    
-    public void setLabel(String newLabel){
-        label = newLabel;
+
     }
   
     public void setJType(String instruction, int jump){
@@ -37,24 +35,34 @@ class Instruction{
     }
 
     public String toHex(){
-        long temp = InstructionSet.getOpCode(instruction);
+        long
+        temp = InstructionSet.getOpCode(instruction);
+
         if(type == "J"){
             temp = (temp << 26) +  jumpAddress;
         }else if(type == "R"){
             temp = (temp << 5) + Registers.get(source);
             temp = (temp << 5) + Registers.get(target);
             temp = (temp << 5) + Registers.get(destination);
-            temp = (temp << 10) + InstructionSet.getFunct(instruction);
+            temp = (temp << 11) + InstructionSet.getFunct(instruction);
         }else if(type == "I"){
             temp = (temp << 5) +  Registers.get(source);
             temp = (temp << 5) + Registers.get(target);
             temp = (temp << 16) + immediate;
-        }       
-        return Long.toHexString(temp);
+System.out.printf("%s\t%d\n", instruction, temp);
+        }
+        return String.format("%08x", temp);
     }
 
     public String toString(){ // Formats for output
-       return ("\t\t" + address + "\t" + toHex());
+        String
+        returnString,
+        machineLang;
+
+        machineLang = toHex();
+        returnString = String.format("%08x\t%s", address, machineLang);
+
+       return returnString;
     }
 
 }
