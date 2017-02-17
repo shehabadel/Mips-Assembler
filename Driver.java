@@ -58,8 +58,7 @@ public class Driver {
 
           String
           label,
-          nonLabeledInstruction,
-          instructionType;
+          nonLabeledInstruction;
 
           String []
           instructionArray;
@@ -67,12 +66,14 @@ public class Driver {
           mipsInstruction = new Instruction(address);
           label = "";
           nonLabeledInstruction = "";
-          instructionType = "";
 
           if (inputLine.indexOf('#') != -1) {
             inputLine = inputLine.substring(0, inputLine.indexOf('#'));
             nonLabeledInstruction = inputLine;
           }//if
+          else {
+            nonLabeledInstruction = inputLine + "\t\t";
+          }//else
 
           if (inputLine.indexOf(":") != -1) {
             label = inputLine.substring(0, inputLine.indexOf(":"));
@@ -81,13 +82,33 @@ public class Driver {
           }//if
 
           inputLine = inputLine.replaceAll("\\s+", " ");
-          inputLine = inputLine.replaceAll(",", "");
 
-          instructionArray = inputLine.split(" ");
-          instructionType = mipsInstructionSet.getType(instructionArray[1]);
+          if (inputLine.indexOf('(') != -1) {
+            String
+            temp;
 
-          switch (instructionType) {
+            inputLine = inputLine.replaceAll("\\(", " ");
+            inputLine = inputLine.replaceAll("\\)", " ");
+
+            inputLine = inputLine.replaceAll(",", "");
+            instructionArray = inputLine.split(" ");
+
+            temp = instructionArray[4];
+            instructionArray[4] = instructionArray[3];
+            instructionArray[3] = temp;
+          }
+          else {
+            inputLine = inputLine.replaceAll(",", "");
+            instructionArray = inputLine.split(" ");
+          }
+
+          switch (mipsInstructionSet.getType(instructionArray[1])) {
             case "I": {
+              if (symbolTable.containsKey(instructionArray[4])) {
+                instructionArray[4] = Integer.toString(symbolTable.get(instructionArray[4]));
+              }
+
+              mipsInstruction.setIType(instructionArray[1], instructionArray[3], instructionArray[2], instructionArray[4]);
 
               break;
             }//case
@@ -97,8 +118,9 @@ public class Driver {
               break;
             }//case
             case "R": {
-              if (instructionArray[1] == "jr") {
+              if (instructionArray[1].indexOf("jr") != -1) {
                 mipsInstruction.setRType(instructionArray[1], instructionArray[2], "", "");
+                nonLabeledInstruction = nonLabeledInstruction + "\t";
               }
               else {
                 mipsInstruction.setRType(instructionArray[1], instructionArray[3], instructionArray[4], instructionArray[2]);
