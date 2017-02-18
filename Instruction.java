@@ -36,7 +36,7 @@ class Instruction{
             this.immediate = (this.immediate - address - 4) / 4;
             this.source = target;
             this.target = source;
-          
+            this.immediate = this.immediate & 0x0000FFFF;
         }
 
         type = "I";   
@@ -57,7 +57,6 @@ class Instruction{
             temp = (temp << 5) +  Registers.get(source);
             temp = (temp << 5) + Registers.get(target);
             temp = (temp << 16) + immediate;
-System.out.printf("%s\t%d\n", instruction, temp);
         }
         return String.format("%08x", temp);
     }

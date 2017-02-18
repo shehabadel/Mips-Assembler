@@ -102,6 +102,13 @@ public class Driver {
             instructionArray = inputLine.split(" ");
           }
 
+         //Skip if line is empty or was only comment
+         if(nonLabeledInstruction.trim().length() == 0){
+            continue;
+         }
+
+        System.out.println(instructionArray[1]);
+
           switch (mipsInstructionSet.getType(instructionArray[1])) {
             case "I": {
               if (symbolTable.containsKey(instructionArray[4])) {
@@ -112,8 +119,12 @@ public class Driver {
 
               break;
             }//case
-            case "J": {
-              mipsInstruction.setJType(instructionArray[1], symbolTable.get(instructionArray[2]));
+            case "J": {               
+              if(symbolTable.containsKey(instructionArray[2])){
+                instructionArray[2] = Integer.toString(symbolTable.get(instructionArray[2]));
+              }
+             
+              mipsInstruction.setJType(instructionArray[1], Integer.parseInt(instructionArray[2]));
 
               break;
             }//case
