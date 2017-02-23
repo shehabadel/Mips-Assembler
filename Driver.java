@@ -49,65 +49,95 @@ public class Driver {
 
         inputLine = bufferedReader.readLine();
 
-        instructionsList.add("MIPS Code\t\t\t\t\tAddress\t\tMachine Lang");
         instructionsList.add(inputLine);
 
         while ((inputLine = bufferedReader.readLine()) != null) {
-          Instruction
-          mipsInstruction;
 
           String
-          label,
-          nonLabeledInstruction;
+          label;
 
           String []
           instructionArray;
-
-          mipsInstruction = new Instruction(address);
+		  
           label = "";
-          nonLabeledInstruction = "";
 
           if (inputLine.indexOf('#') != -1) {
             inputLine = inputLine.substring(0, inputLine.indexOf('#'));
-            nonLabeledInstruction = inputLine;
           }//if
           else {
-            nonLabeledInstruction = inputLine + "\t\t";
+            inputLine = inputLine + "\t\t";
           }//else
+		  
+		  if (inputLine.trim().length() == 0) {
+			  continue;
+		  }//if
 
           if (inputLine.indexOf(":") != -1) {
             label = inputLine.substring(0, inputLine.indexOf(":"));
-            inputLine = inputLine.substring(inputLine.indexOf(":") + 1, inputLine.length() - 1);
             symbolTable.put(label, address);
           }//if
 
-          inputLine = inputLine.replaceAll("\\s+", " ");
+			instructionsList.add(inputLine);
+			address = address + 4;
+        }//while
 
-          if (inputLine.indexOf('(') != -1) {
-            String
+        fileFound = !fileFound;
+
+        bufferedReader.close();
+      }//try
+      catch (FileNotFoundException ex) {
+        System.out.printf("File %s was not found.\n", filename);
+      }//catch
+      catch (IOException ex) {
+        System.out.printf("Error when reading %s.\n", filename);
+      }//catch
+    }//while
+	
+	address = Integer.parseInt("400000", 16);
+
+	for (int ndx = 0; ndx < instructionsList.size(); ndx++) {
+        Instruction
+        mipsInstruction;
+		  
+        String []
+        instructionArray;
+		
+		String
+		currentInstruction;
+		  
+		if (instructionsList.get(ndx).indexOf('.') != -1) {
+			continue;
+		}//if
+		
+		currentInstruction = instructionsList.get(ndx);
+
+        mipsInstruction = new Instruction(address);
+
+
+        if (currentInstruction.indexOf(":") != -1) {
+            currentInstruction = currentInstruction.substring(currentInstruction.indexOf(":") + 1, currentInstruction.length());
+        }//if
+		
+		
+        currentInstruction = currentInstruction.replaceAll(",", "");
+		currentInstruction = currentInstruction.replaceAll("\\s+", " ");
+		  
+        if (currentInstruction.indexOf('(') != -1) {
+			String
             temp;
 
-            inputLine = inputLine.replaceAll("\\(", " ");
-            inputLine = inputLine.replaceAll("\\)", " ");
+            currentInstruction = currentInstruction.replaceAll("\\(", " ");
+            currentInstruction = currentInstruction.replaceAll("\\)", " ");
 
-            inputLine = inputLine.replaceAll(",", "");
-            instructionArray = inputLine.split(" ");
+            instructionArray = currentInstruction.split(" ");
 
             temp = instructionArray[4];
             instructionArray[4] = instructionArray[3];
             instructionArray[3] = temp;
-          }
-          else {
-            inputLine = inputLine.replaceAll(",", "");
-            instructionArray = inputLine.split(" ");
-          }
-
-         //Skip if line is empty or was only comment
-         if(nonLabeledInstruction.trim().length() == 0){
-            continue;
-         }
-
-        System.out.println(instructionArray[1]);
+		}
+        else {
+            instructionArray = currentInstruction.split(" ");
+        }
 
           switch (mipsInstructionSet.getType(instructionArray[1])) {
             case "I": {
@@ -131,7 +161,7 @@ public class Driver {
             case "R": {
               if (instructionArray[1].indexOf("jr") != -1) {
                 mipsInstruction.setRType(instructionArray[1], instructionArray[2], "", "");
-                nonLabeledInstruction = nonLabeledInstruction + "\t";
+                currentInstruction = currentInstruction + "\t";
               }
               else {
                 mipsInstruction.setRType(instructionArray[1], instructionArray[3], instructionArray[4], instructionArray[2]);
@@ -143,34 +173,19 @@ public class Driver {
 
             }//default
           }//switch
-
-          nonLabeledInstruction = nonLabeledInstruction + mipsInstruction.toString();
-
-          instructionsList.add(nonLabeledInstruction);
-
-          address = address + 4;
-        }//while
-
-        fileFound = !fileFound;
-
-        bufferedReader.close();
-      }//try
-      catch (FileNotFoundException ex) {
-        System.out.printf("File %s was not found.\n", filename);
-      }//catch
-      catch (IOException ex) {
-        System.out.printf("Error when reading %s.\n", filename);
-      }//catch
-    }//while
-
+		  
+		  instructionsList.set(ndx, instructionsList.get(ndx) + mipsInstruction.toString());
+		
+        address = address + 4;
+	}//for
+	
     System.out.println("Symbol Table:\n\nLabel\t\tAddress (in hex)");
 
     for (Map.Entry<String, Integer> entry : symbolTable.entrySet()) {
       System.out.printf("%s\t\t%08x\n", entry.getKey(), entry.getValue());
     }//for
 
-    System.out.println('\0');
-
+	System.out.println("\nMIPS Code\t\t\t\t\tAddress\t\tMachine Lang.");
     for (String mipsInstructionData : instructionsList) {
       System.out.printf("%s\n", mipsInstructionData);
     }//for
