@@ -5,6 +5,7 @@ class Registers{
 
     public static void init(){
         registerMap = new HashMap<>();
+        registerMap.put("", 0);
         registerMap.put("$zero", 0);
         registerMap.put("$at", 1);
         registerMap.put("$v0", 2);

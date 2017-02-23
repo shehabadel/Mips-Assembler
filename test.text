@@ -10,4 +10,5 @@ loop:           lw      $t2, 0($t0)             #$t2 holds the array element
                 addi    $t0, $t0, 4             #$t0 points to the next array element
                 slt     $t4, $t0, $t1
                 bne     $t4, $zero, loop        #Continue loop if $t0<$t1
+                jr      $ra
 outside:        sw      $t3, 0($s2)             #Store the result
