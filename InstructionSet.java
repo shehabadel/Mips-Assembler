@@ -4,6 +4,7 @@ class InstructionSet{
    
     private static HashMap<String, InstructionStruct> instructionMap;
 
+    //Adds all of the instructions being implemented to the map.
     public void init(){
    
         //add, sub, addi, lw, sw, slt, slti, beq, bne, j, jal, jr    
@@ -55,7 +56,8 @@ class InstructionSet{
         }
   
     }
-
+    
+    //Acts as a struct to keep the instruction data togehter.
     private class InstructionStruct{
         public String instruction;
         public String type;

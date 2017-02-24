@@ -1,4 +1,5 @@
 class Instruction{  
+    //Set up data that the instruction should store.
     private int address, jumpAddress, immediate;
     private String instruction, source, target, destination, type;
 
@@ -10,14 +11,16 @@ class Instruction{
         this.address = address;
 
     }
-  
+    
+    //Sets up a j-type instruction
     public void setJType(String instruction, int jump){
         this.instruction = instruction;     
-        this.jumpAddress = jump; 
+        this.jumpAddress = jump;  
         type = "J";   
     }
+
+    //Sets up a r-type instruction.
     public void setRType(String instruction, String source, String target, String destination){
-     
         this.instruction = instruction;
         this.destination = destination;
         this.source = source;
@@ -25,27 +28,31 @@ class Instruction{
         type = "R";
     }
 
+    //Sets up I-type instruction.
     public void setIType(String instruction, String source, String target, String immediate){
-    
+        //Initialize variables.
         this.instruction = instruction;
         this.source = source;
         this.target = target;
         this.immediate = Integer.parseInt(immediate);
-    
+        
+        //Branching switches some registers. Perform switch.
         if(instruction.equals("bne") || instruction.equals("beq")){
             this.immediate = (this.immediate - address - 4) / 4;
             this.source = target;
             this.target = source;
             this.immediate = this.immediate & 0x0000FFFF;
         }
-
+    
         type = "I";   
     }
 
-    public String toHex(){
-        long
-        temp = InstructionSet.getOpCode(instruction);
 
+    //Create a hex representation of the instruction.
+    public String toHex(){
+        long temp = InstructionSet.getOpCode(instruction);
+        
+        //Follow MIPS Green Card order of information.
         if(type == "J"){
             temp = (temp << 26) +  jumpAddress;
         }else if(type == "R"){
@@ -58,6 +65,7 @@ class Instruction{
             temp = (temp << 5) + Registers.get(target);
             temp = (temp << 16) + immediate;
         }
+        //Return the hex value with 8 characters. 32-bit instruction.
         return String.format("%08x", temp);
     }
 
