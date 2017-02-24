@@ -8,25 +8,32 @@ public class Driver {
 
     String
     filename,
-    inputLine;
+    inputLine,
+    currentInstruction;
+
+    String []
+    instructionArray;
+
+    int
+    address;
+
+    boolean
+    fileFound;
 
     InstructionSet
     mipsInstructionSet;
 
+    Instruction
+    mipsInstruction;
+
     Registers
     registers;
-
-    int
-    address;
 
     FileReader
     fileReader;
 
     BufferedReader
     bufferedReader;
-
-    boolean
-    fileFound;
 
     address = Integer.parseInt("400000", 16);
     fileFound = false;
@@ -35,8 +42,6 @@ public class Driver {
 
     mipsInstructionSet.init();
     registers.init();
-
-    //Read in file
 
     while (!fileFound) {
       System.out.print("Enter a file containing valid MIPS code> ");
@@ -55,9 +60,6 @@ public class Driver {
 
           String
           label;
-
-          String []
-          instructionArray;
 		  
           label = "";
 
@@ -68,17 +70,17 @@ public class Driver {
             inputLine = inputLine + "\t\t";
           }//else
 		  
-		  if (inputLine.trim().length() == 0) {
-			  continue;
-		  }//if
+          if (inputLine.trim().length() == 0) {
+            continue;
+          }//if
 
           if (inputLine.indexOf(":") != -1) {
             label = inputLine.substring(0, inputLine.indexOf(":"));
             symbolTable.put(label, address);
           }//if
 
-			instructionsList.add(inputLine);
-			address = address + 4;
+          instructionsList.add(inputLine);
+          address = address + 4;
         }//while
 
         fileFound = !fileFound;
@@ -93,91 +95,92 @@ public class Driver {
       }//catch
     }//while
 	
-	address = Integer.parseInt("400000", 16);
+    address = Integer.parseInt("400000", 16);
 
-	for (int ndx = 0; ndx < instructionsList.size(); ndx++) {
-        Instruction
-        mipsInstruction;
-		  
-        String []
-        instructionArray;
-		
-		String
-		currentInstruction;
-		  
-		if (instructionsList.get(ndx).indexOf('.') != -1) {
-			continue;
-		}//if
-		
-		currentInstruction = instructionsList.get(ndx);
+  	for (int ndx = 0; ndx < instructionsList.size(); ndx++) {
+  		  
+  		if (instructionsList.get(ndx).indexOf('.') != -1) {
+  			continue;
+  		}//if
+  		
+  		currentInstruction = instructionsList.get(ndx);
 
-        mipsInstruction = new Instruction(address);
+      mipsInstruction = new Instruction(address);
 
+      if (currentInstruction.indexOf(":") != -1) {
+        currentInstruction = currentInstruction.substring(
+        currentInstruction.indexOf(":") + 1, currentInstruction.length());
+      }//if
+  
+      currentInstruction = currentInstruction.replaceAll(",", "");
+  		currentInstruction = currentInstruction.replaceAll("\\s+", " ");
+  		  
+      if (currentInstruction.indexOf('(') != -1) {
+  			String
+        temp;
 
-        if (currentInstruction.indexOf(":") != -1) {
-            currentInstruction = currentInstruction.substring(currentInstruction.indexOf(":") + 1, currentInstruction.length());
-        }//if
-		
-		
-        currentInstruction = currentInstruction.replaceAll(",", "");
-		currentInstruction = currentInstruction.replaceAll("\\s+", " ");
-		  
-        if (currentInstruction.indexOf('(') != -1) {
-			String
-            temp;
+        currentInstruction = currentInstruction.replaceAll("\\(", " ");
+        currentInstruction = currentInstruction.replaceAll("\\)", " ");
 
-            currentInstruction = currentInstruction.replaceAll("\\(", " ");
-            currentInstruction = currentInstruction.replaceAll("\\)", " ");
+        instructionArray = currentInstruction.split(" ");
 
-            instructionArray = currentInstruction.split(" ");
+        temp = instructionArray[4];
+        instructionArray[4] = instructionArray[3];
+        instructionArray[3] = temp;
+  		}//if
+      else {
+        instructionArray = currentInstruction.split(" ");
+      }//else
 
-            temp = instructionArray[4];
-            instructionArray[4] = instructionArray[3];
-            instructionArray[3] = temp;
-		}
-        else {
-            instructionArray = currentInstruction.split(" ");
-        }
+      switch (mipsInstructionSet.getType(instructionArray[1])) {
+        case "I": {
+          if (symbolTable.containsKey(instructionArray[4])) {
+            instructionArray[4] = Integer.toString(
 
-          switch (mipsInstructionSet.getType(instructionArray[1])) {
-            case "I": {
-              if (symbolTable.containsKey(instructionArray[4])) {
-                instructionArray[4] = Integer.toString(symbolTable.get(instructionArray[4]));
-              }
+            symbolTable.get(instructionArray[4]));
+          }//if
 
-              mipsInstruction.setIType(instructionArray[1], instructionArray[3], instructionArray[2], instructionArray[4]);
+          mipsInstruction.setIType(instructionArray[1], instructionArray[3], 
+          instructionArray[2], instructionArray[4]);
 
-              break;
-            }//case
-            case "J": {               
-              if(symbolTable.containsKey(instructionArray[2])){
-                instructionArray[2] = Integer.toString(symbolTable.get(instructionArray[2]));
-              }
-             
-              mipsInstruction.setJType(instructionArray[1], Integer.parseInt(instructionArray[2]));
+          break;
+        }//case
+        case "J": {               
+          if(symbolTable.containsKey(instructionArray[2])){
+            instructionArray[2] = Integer.toString(
 
-              break;
-            }//case
-            case "R": {
-              if (instructionArray[1].indexOf("jr") != -1) {
-                mipsInstruction.setRType(instructionArray[1], instructionArray[2], "", "");
-                currentInstruction = currentInstruction + "\t";
-              }
-              else {
-                mipsInstruction.setRType(instructionArray[1], instructionArray[3], instructionArray[4], instructionArray[2]);
-              }
+            symbolTable.get(instructionArray[2]));
+          }//if
+         
+          mipsInstruction.setJType(instructionArray[1], 
+          Integer.parseInt(instructionArray[2]));
 
-              break;
-            }//case
-            default: {
+          break;
+        }//case
+        case "R": {
+          if (instructionArray[1].indexOf("jr") != -1) {
+            mipsInstruction.setRType(instructionArray[1], instructionArray[2],
+              "", "");
+            
+            currentInstruction = currentInstruction + "\t";
+          }//if
+          else {
+            mipsInstruction.setRType(instructionArray[1], instructionArray[3],
+              instructionArray[4], instructionArray[2]);
+          }//else
 
-            }//default
-          }//switch
-		  
-		  instructionsList.set(ndx, instructionsList.get(ndx) + mipsInstruction.toString());
-		
-        address = address + 4;
-	}//for
+          break;
+        }//case
+        default: {
+
+        }//default
+      }//switch
+  		  
+  		instructionsList.set(ndx, instructionsList.get(ndx) +
+        mipsInstruction.toString());
+  		
+      address = address + 4;
+  	}//for
 	
     System.out.println("Symbol Table:\n\nLabel\t\tAddress (in hex)");
 
@@ -185,14 +188,9 @@ public class Driver {
       System.out.printf("%s\t\t%08x\n", entry.getKey(), entry.getValue());
     }//for
 
-	System.out.println("\nMIPS Code\t\t\t\t\tAddress\t\tMachine Lang.");
+    System.out.println("\nMIPS Code\t\t\t\t\tAddress\t\tMachine Lang.");
     for (String mipsInstructionData : instructionsList) {
       System.out.printf("%s\n", mipsInstructionData);
     }//for
-    //First Pass Logic
-    //
-    //Second Pass Logic
-    //  
-    //Output
   }//main
 }//Driver
