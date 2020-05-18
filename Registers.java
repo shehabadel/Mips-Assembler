@@ -5,7 +5,7 @@ class Registers{
     
     //Initiates the Register map and sets up the list.
     public static void init(){
-        registerMap = new HashMap<>();
+       registerMap = new HashMap<>();
         registerMap.put("", 0);
         registerMap.put("$zero", 0);
         registerMap.put("$at", 1);
@@ -39,10 +39,14 @@ class Registers{
         registerMap.put("$sp", 29);
         registerMap.put("$fp", 30);
         registerMap.put("$ra", 31);
+        
     }
     
     //Allows us to find and get the register.
     public static Integer get(String register){
         return registerMap.get(register);
+    }
+    public static void setValue(String register, Integer value){
+        registerMap.replace(register, value);
     }
 }

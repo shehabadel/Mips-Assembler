@@ -11,7 +11,69 @@ class Instruction{
         this.address = address;
 
     }
-    
+    Instruction(String instruction, String destination, String source, String target)
+    {
+        this.instruction=instruction;
+        this.source=source;
+        this.target=target;
+        this.destination=destination;
+    }
+    Instruction(String instruction, String destination, String source, int immediate){
+        this.instruction=instruction;
+        this.destination=destination;
+        this.source=source;
+        this.immediate=immediate;
+    }
+    //some setters
+    public void setInstruction(String instruction)
+    {
+        this.instruction=instruction;
+    }
+    public void setSource(String source)
+    {
+        this.source=source;
+    }
+    public void setTarget(String target)
+    {
+        this.target=target;
+    }
+    public void setDes(String destination)
+    {
+        this.destination=destination;
+    }
+    //some getters
+    public String getInstruction(Instruction ins)
+    {
+        return ins.instruction;
+    }
+    public String getSource(Instruction ins)
+    {
+        return ins.source;
+    }
+    public String getTarget(Instruction ins)
+    {
+        return ins.target;
+    }
+    public String getDest(Instruction ins)
+    {
+        return ins.destination;
+    }
+    public String getType(Instruction ins)
+    {
+        return ins.type;
+    }
+    public int getAddress(Instruction ins)
+    {
+        return ins.address;
+    }
+    public int getImmediate(Instruction ins)
+    {
+        return ins.immediate;
+    }
+    public int getJump(Instruction ins)
+    {
+        return ins.jumpAddress;
+    }
     //Sets up a j-type instruction
     public void setJType(String instruction, int jump){
         this.instruction = instruction;     
@@ -68,7 +130,9 @@ class Instruction{
         //Return the hex value with 8 characters. 32-bit instruction.
         return String.format("%08x", temp);
     }
+    
 
+    
     public String toString(){ // Formats for output
         String
         returnString,
