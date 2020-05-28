@@ -1,0 +1,6 @@
+slti $at, $s5, 5
+beq $at, $zero, Else
+add $s6, $s5, $zero
+j Exit
+Else: add $s6, $zero, $zero
+Exit:
