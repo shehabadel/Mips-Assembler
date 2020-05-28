@@ -1,7 +1,9 @@
 class Instruction{  
     //Set up data that the instruction should store.
     private int address, jumpAddress, immediate;
-    private String instruction, source, target, destination, type;
+    private int shamt=0;
+    private String instruction, source, target, destination, type, label;
+    private static boolean flag;
 
     
     //Destination will hold immediates and jump addresses
@@ -25,6 +27,13 @@ class Instruction{
         this.immediate=immediate;
     }
     //some setters
+    public void setFlag(boolean flag)
+    {
+        this.flag=flag;
+    }
+    public static boolean getFlag(){
+        return flag;
+    } 
     public void setInstruction(String instruction)
     {
         this.instruction=instruction;
@@ -62,11 +71,12 @@ class Instruction{
     {
         return ins.type;
     }
+
     public int getAddress(Instruction ins)
     {
         return ins.address;
     }
-    public int getImmediate(Instruction ins)
+    public Integer getImmediate(Instruction ins)
     {
         return ins.immediate;
     }
@@ -74,6 +84,24 @@ class Instruction{
     {
         return ins.jumpAddress;
     }
+    public static Integer getShamt(Instruction ins)
+    {
+        return ins.shamt;
+    }
+    public static String getLabel(Instruction ins)
+    {
+        return ins.label;
+    }
+    public void setLabel(String label)
+    {
+        this.label=label;
+    }
+    public void setShamt(int shamt)
+    {
+        this.shamt=shamt;
+    }
+
+
     //Sets up a j-type instruction
     public void setJType(String instruction, int jump){
         this.instruction = instruction;     
@@ -89,51 +117,152 @@ class Instruction{
         this.target = target;
         type = "R";
     }
+    public void setRType(String instruction, String source, String target, String destination, String shamt){
+        this.instruction = instruction;
+        this.destination = destination;
+        this.source = source;
+        this.target = target;
+        this.shamt = Integer.parseInt(shamt);
+        type = "R";
+
+        
+    }
 
     //Sets up I-type instruction.
     public void setIType(String instruction, String source, String target, String immediate){
         //Initialize variables.
+        if(instruction.equals("lui"))
+        {
+            setLui(instruction, target, immediate);
+        }
+        else if(instruction.equals("beq")||instruction.equals("bne")){
+            this.instruction = instruction;
+            this.source = source;
+            this.target = target;
+            this.immediate= Integer.parseInt(immediate);  
+        }
+        else{
         this.instruction = instruction;
         this.source = source;
         this.target = target;
-        this.immediate = Integer.parseInt(immediate);
-        
+        try{
+            this.immediate = Integer.parseInt(immediate);
+        }catch(NumberFormatException e)
+        {   System.out.println("Exception caught, by default the immediate = zero");
+            this.immediate = 0;
+        }
+        }
         //Branching switches some registers. Perform switch.
-        if(instruction.equals("bne") || instruction.equals("beq")){
+        /*if(instruction.equals("bne") || instruction.equals("beq")){
+            //setBranch(instruction, source, target, label);
+
+            
             this.immediate = (this.immediate - address - 4) / 4;
             this.source = target;
             this.target = source;
-            this.immediate = this.immediate & 0x0000FFFF;
-        }
-    
+        this.immediate = this.immediate & 0x0000FFFF;   
+        }*/
         type = "I";   
     }
-
-
+    public void setLui(String instruction, String target, String immediate){
+        this.instruction = instruction;
+        this.target = target;
+        this.immediate = Integer.parseInt(immediate);
+    }
+    public void setBranch(String instruction, String source, String target, String label, Integer address)
+    {
+        this.instruction=instruction;
+        this.source=source;
+        this.target=target;
+        this.label=label;
+    }
     //Create a hex representation of the instruction.
     public String toHex(){
         long temp = InstructionSet.getOpCode(instruction);
-        
+        //String tempS=;
         //Follow MIPS Green Card order of information.
         if(type == "J"){
             temp = (temp << 26) +  jumpAddress;
         }else if(type == "R"){
+            if(instruction.equals("srl")||instruction.equals("sll")||instruction.equals("sra") ){
+                temp =(temp<<5) + 0;
+            }else{
             temp = (temp << 5) + Registers.get(source);
+            }
             temp = (temp << 5) + Registers.get(target);
             temp = (temp << 5) + Registers.get(destination);
+            temp = (temp << 5) + shamt;
             temp = (temp << 11) + InstructionSet.getFunct(instruction);
         }else if(type == "I"){
-            temp = (temp << 5) +  Registers.get(source);
+            if(instruction.equals("lui"))
+            {
+                temp=(temp<<5) + 0;
+            }
+            else{
+                temp = (temp << 5) +  Registers.get(source);
+            }
             temp = (temp << 5) + Registers.get(target);
             temp = (temp << 16) + immediate;
         }
         //Return the hex value with 8 characters. 32-bit instruction.
         return String.format("%08x", temp);
     }
-    
+    public String toBinary(Instruction ins){         //Instead of toHex();
+        String temp="";
+        String op=Integer.toBinaryString(InstructionSet.getOpCode(instruction));
+        String opLead=String.format("%6s",op).replace(' ', '0');
+        temp=opLead;
+        if(type=="J"){
+            String JumpAddress=Integer.toBinaryString(jumpAddress);
+            String JumpAddressLead=String.format("%26s",JumpAddress).replace(' ', '0');
+            temp = temp +  JumpAddressLead;
+        }
 
+        if(type=="R")
+        {
+            String rs= Integer.toBinaryString(Registers.get(source)); //converting rs into binary
+            String rsLead= String.format("%5s",rs).replace(' ', '0'); //formating it into 5 bits
+            temp=temp+rsLead;                                         //appending it to temp
+            String rt= Integer.toBinaryString(Registers.get(target));
+            String rtLead= String.format("%5s",rt).replace(' ', '0');
+            temp=temp+rtLead;
+            String rd= Integer.toBinaryString(Registers.get(destination));
+            String rdLead= String.format("%5s",rd).replace(' ', '0');
+            temp=temp+rdLead;
+            String shmt= Integer.toBinaryString(getShamt(ins));
+            String shmtLead= String.format("%5s",shmt).replace(' ', '0');
+            temp=temp+shmtLead;
+            String func=Integer.toBinaryString(InstructionSet.getFunct(instruction));
+            String funcLead=String.format("%6s",func).replace(' ','0');
+            temp=temp+funcLead;
+        }
+        if(type=="I")
+        {
+            String rs= Integer.toBinaryString(Registers.get(source)); //converting rs into binary
+            String rsLead= String.format("%5s",rs).replace(' ', '0'); //formating it into 5 bits
+            temp=temp+rsLead;                                         //appending it to temp
+            String rt= Integer.toBinaryString(Registers.get(target));
+            String rtLead= String.format("%5s",rt).replace(' ', '0');
+            temp=temp+rtLead;
+            String imm=Integer.toBinaryString(ins.getImmediate(ins));
+            String immLead=String.format("%16s",imm).replace(' ','0');
+            temp=temp+immLead;
+        }
+        return temp;
+    }
     
-    public String toString(){ // Formats for output
+    public String hexToBinary(String hex)
+    {
+        int i = Integer.parseInt(hex, 16);
+        String bin = Integer.toBinaryString(i);
+        return bin;
+    }
+    public Integer binaryToDecimal(String bin)
+    {
+        return Integer.parseInt(bin, 2);
+    }
+
+    public String toString(Instruction ins){ // Formats for output
         String
         returnString,
         machineLang;

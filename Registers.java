@@ -2,10 +2,11 @@ import java.util.HashMap;
 
 class Registers{
     private static HashMap<String, Integer> registerMap;
-    
+   
     //Initiates the Register map and sets up the list.
     public static void init(){
        registerMap = new HashMap<>();
+       
         registerMap.put("", 0);
         registerMap.put("$zero", 0);
         registerMap.put("$at", 1);
@@ -40,6 +41,9 @@ class Registers{
         registerMap.put("$fp", 30);
         registerMap.put("$ra", 31);
         
+
+        
+        
     }
     
     //Allows us to find and get the register.
@@ -49,4 +53,6 @@ class Registers{
     public static void setValue(String register, Integer value){
         registerMap.replace(register, value);
     }
-}
+   
+    }
+
